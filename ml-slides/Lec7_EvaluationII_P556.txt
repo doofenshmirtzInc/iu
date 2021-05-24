@@ -1,0 +1,954 @@
+Evaluation II
+CSCI-P556 Applied Machine Learning
+Lecture 7
+D.S. Williamson
+1
+
+Agenda and Learning Outcomes
+Today’s Topics
+
+• Announcements:
+
+• Topics:
+
+• Setup IU Github account. Create
+
+• Other measures of performance for
+
+Repo. Check Piazza for details
+
+classification
+
+• Notetakers’ notes are on Canvas
+
+• Receiver Operating
+
+Characteristics (ROC)
+
+• Homework 1 will be posted today
+or tomorrow, at the latest.
+
+• Area under ROC
+
+• Will give time during class on
+
+• Measures of performance for
+
+Thursday to meet partner
+
+regression
+
+2
+
+Recall: Types of Labels (or Targets)
+Labels are generally divided into two classes
+D = {(x1 , y1 ), (x2 , y2 ), . . . , (xi , yi ), . . . , (xN , yN )}
+<latexit sha1_base64="RH3kt5pd5TG+Lfdgol0Tls06hds=">AAACYXicbZFLSwMxFIXT8dXW11iX3QSL0EIpM0XQjVDUhatSwT6gU0omTdvQZGZIMuIwzF9071b/glvF9DFgWy8EDue7NzecuAGjUlnWe8bY2d3bP8jm8odHxyen5lmhI/1QYNLGPvNFz0WSMOqRtqKKkV4gCOIuI113dj/n3RciJPW9ZxUFZMDRxKNjipHS1tCcPsBb6MRlx+XxazK0q3MRaVGppl499eqVKnRGvpJVmDKaMrrNmtpZwmbFSYZmyapZi4Lbwl6JElhVa2h+6PtwyImnMENS9m0rUIMYCUUxI0neCSUJEJ6hCelr6SFO5CBeJJLAS+2M4NgX+ngKLty/EzHiUkbc1Z0cqancZHPzP9YP1fhmEFMvCBXx8HLROGRQ+XAeLxxRQbBikRYIC6rfCvEUCYSV/oS1LS5P8joUezOCbdGp12yrZj9dlRp3q3iyoAguQBnY4Bo0wCNogTbA4A18gW/wk/k0coZpFJatRmY1cw7Wyij+ApKpt3o=</latexit>
+
+• Categorical: Integer (Discrete) values are assigned as label
+• Examples:
+• Fruit: Apple, Orange, Banana, Grapes, etc.
+• Musical artist: Michael Jackson, Taylor Swift, Elvis, etc.
+• Speech present: yes or no
+• C = 2 (Binary Classification); C > 2 (Multiclass classification)
+• One-hot encoding is also done
+• Define binary vector based on number of labels
+• True label for input gets value of 1 all others get zero
+• Animal recognition problem define 4-D vector with
+• Label vector for Dog image is [0, 1, 0, 0]
+3
+
+wt [kg]
+
+ht [m]
+
+T [ C]
+
+sbp [mmHg]
+
+dbp [mmHg]
+
+x1
+
+91
+
+1.85
+
+36.6
+
+121
+
+75
+
+1
+
+x2
+
+75
+
+1.80
+
+37.4
+
+128
+
+85
+
++1
+
+x3
+
+54
+
+1.56
+
+36.6
+
+110
+
+62
+
+1
+
+y
+
+Table 3.1: An example of a binary classification problem: prediction of a
+disease state for a patient. Here, features indicate weight (wt), height (ht),
+temperature (T), systolic blood pressure (sbp), and diastolic blood pressure
+(dbp). The class labels indicate presence of a particular disease, e.g. diabetes.
+This data set contains one positive data point (x2 ) and two negative data
+points (x1 , x3 ). The class label shows a disease state, i.e. yi = +1 indicates
+the presence while yi = 1 indicates absence of disease.
+
+ing task as multi-label classification and set Y = {sports, medicine, travel, . . .}.
+Finally, Y can be a set of structured outputs, e.g. strings, trees, or graphs.
+This classification scenario is usually referred to as structured-output learnindexing
+[Cats,
+Dogs,ofBears,
+Fish]
+ing. The
+cardinality
+the output
+space in structured-output learning problems is often very high. An example of a regression problem is shown in
+Table 3.2.
+In both prediction scenarios, we assume that the features are easy to
+
+Recall: Accuracy Measures
+Four common metrics for assessing classification performance
+
+TP + TN
+Accuracy =
+TP + FP + TN + FN
+FP + FN
+Misclassification Rate =
+TP + FP + TN + FN
+
+Predicted result
+Class A Class B
+True
+False Class A
+Positive Negative (e.g.
+True
+(TP)
+haveB Result
+False
+True
+Class
+Positive Negative (e.g. do
+(FP)
+(TN)
+not
+
+• Precision = (# of relevant items retrieved)
+/ (total # of items retrieved)
+= TP / (TP + FP)
+@ P(is pos | called pos)
+
+TP
+True Positive Rate(sensitivity) =
+TP + FN
+
+• Recall
+
+= (# of relevant items retrieved)
+/ (# of relevant items that exist)
+= TP/(TP+FN) = TPR
+@ P(called pos | is pos)
+
+TN
+True Negative Rate(specificity) =
+TN + FP
+4
+
+ROC Curves
+Another metric for assessing classification performance
+• ROC: Receiver Operating Characteristics
+• Started for radar research during WWII
+• Judging algorithms on accuracy alone may not be good enough
+• Why? Getting a true positive wrong costs more than getting a true negative
+wrong (or vice versa)
+
+• Examples:
+• Mis-diagnosing serious medical disease of a patient
+• Miss detecting enemy aircraft
+5
+
+•
+
+ROC curves for two diﬀerent
+algorithms
+
+• ROC curves are (mainly) a
+
+function of TPR (y-axis) and
+FPR (x-axis)
+
+• Ideally want, low FPR and high
+TPR
+
+Ideal Spot
+1.0
+True positives rate
+
+A graphical depiction
+
+Prob (alg outputs + | + is correct)
+
+ROC Curves
+Different
+algorithms can
+work better in
+different parts
+of ROC space.
+This depends
+on cost of false
++ vs false -
+
+Alg 1
+Alg 2
+
+False positives rate
+
+1.0
+
+Prob (alg outputs + | - is correct)
+6
+
+Algorithm for Creating ROC Curves
+Assumes already have testing results
+• Step 1: Select threshold for deciding between
+
+predicting one class or another (more on this next)
+
+• Step 2: Generate confusion matrix for classification
+results, based on threshold
+
+• Step 3: Compute true positive rate (TPR) and false
+positive rate (FPR)
+
+• Step 4: Plot point on graph at (FPR,TPR) (e.g. (x,y))
+• Step 5: Adjust “threshold” and repeat steps 1 - 3.
+• Step 6: Connect points to produce ROC Curver
+7
+
+<1H Ocean
+
+Housing Example
+
+Not <1H Ocean
+
+Determine if district is <1H to Ocean (Binary Classification)
+Low Attribute
+value but is
+<1H
+
+• Two classes based on
+closeness to ocean
+
+<1H Ocean
+
+• Depiction of attribute
+value and true class
+label for 9 districts
+
+• Note that the attribute Not <1H Ocean
+value doesn’t clearly
+separate the two classes
+
+Attribute Value
+
+8
+
+High Attribute
+value but not
+<1H
+
+<1H Ocean
+
+Housing Example
+
+Not <1H Ocean
+
+Step 1: Select Threshold
+Classifier (outputs
+probability)
+
+Regression classifier to
+this data (e.g. train it to
+classify if <1H to Ocean or
+not).
+
+• Need to pick threshold to
+decide between two
+classes (e.g. 0.5)
+
+Probability of
+<1H Ocean
+
+• Let’s fit a Logistic-
+
+1
+
+Classify as
+<1H Ocean
+
+0.5
+
+Classify as not
+<1H Ocean
+0
+
+• Threshold turns
+
+Attribute Value
+
+probabilities into decisions
+(e.g. predictions)
+
+Classified as Not
+<1H Ocean
+9
+
+Classified as
+<1H Ocean
+
+Predicted result
+
+Housing Example
+Step 2: Generate Confusion Matrix
+Step 3: Compute TPR and FPR
+
+• Now can Generate
+Probability of
+<1H Ocean
+
+confusion matrix
+
+Predicted result
+
+Class A Class B
+
+Not <1H
+
+4
+
+1
+
+<1H
+
+1
+
+3
+
+Not <1H
+
+True
+Result
+
+Not <1H Ocean
+
+True
+False Class A
+Positive Negative (e.g.
+True
+(TP)
+haveB Result
+False
+True
+Class
+Positive Negative (e.g. do
+(FP)
+(TN)
+not
+
+1
+
+Classify as
+<1H Ocean
+
+0.5
+
+Classify as not
+<1H Ocean
+0
+
+<1H
+
+<1H Ocean
+
+Attribute Value
+TPR = 4/(4 + 1) = 0.8
+FPR = 1/(1+3) = 0.25
+10
+
+Housing Example
+• Plot FPR (x-axis) vs. TPR
+(y-axis) for new point
+
+Predicted result
+<1H
+
+Not <1H
+
+4
+
+1
+
+<1H
+
+1
+
+3
+
+Not <1H
+
+True
+Result
+
+True Positive Rate
+
+Step 4: Plot point in ROC curve
+
+1
+
+0
+
+False Positive Rate
+TPR = 4/(4 + 1) = 0.8
+FPR = 1/(1+3) = 0.25
+11
+
+1
+
+Housing Example - Group Activity
+Repeat process using below thresholds
+
+• Generate Confusion Matrix for
+each threshold
+
+• Compute TPR and FPR for
+each confusion matrix
+
+• Plot FPR vs TPR for each
+
+Probability of
+<1H Ocean
+
+• Thresholds = 0, 0.1, and 1
+
+Predicted result
+Class A Class B
+True
+False Class A
+Positive Negative (e.g.
+True
+(TP)
+haveB Result
+False
+True
+Class
+Positive Negative (e.g. do
+(FP)
+(TN)
+not
+
+1
+
+0.1
+0
+
+threshold
+
+Attribute Value
+
+12
+
+Predicted result
+
+Housing Example - Group Activity
+Repeat process using below thresholds
+
+FPR = 4/4 = 1
+
+<1H
+
+Not <1H
+
+5
+
+0
+
+<1H
+
+4
+
+0
+
+Not <1H
+
+True
+Result
+
+1
+
+Probability of
+<1H Ocean
+
+Threshold = 0
+Predicted result TPR = 1
+
+0.1
+0
+
+Predicted result
+
+TPR = 1
+FPR = 0.5
+
+<1H
+
+Not <1H
+
+5
+
+0
+
+<1H
+
+2
+
+2
+
+Not <1H
+
+True
+Result
+
+Threshold = 1
+
+Threshold = 0.1
+
+13
+
+Predicted result
+
+Class A Class B
+True
+False Class A
+Positive Negative (e.g.
+True
+(TP)
+haveB Result
+False
+True
+Class
+Positive Negative (e.g. do
+(FP)
+(TN)
+not
+
+Attribute Value
+TPR = 0
+FPR = 0
+
+<1H
+
+Not <1H
+
+0
+
+5
+
+<1H
+
+0
+
+4
+
+Not <1H
+
+True
+Result
+
+Housing Example
+• Plot FPR (x-axis) vs. TPR (y-axis) for new
+point
+
+• Connect the dots to generate ROC curve
+• Generally, only consider thresholds that
+lead to changes in predictions (e.g. all
+thresholds aren’t used)
+
+• Select threshold based on highest TPR
+and lowest acceptable FPR (project
+dependent)
+
+True Positive Rate
+
+Step 4: Plot point in ROC curve
+
+ROC Curve
+
+1
+
+0
+
+False Positive Rate
+
+• May replace FPR with Precision, if
+desired.
+
+14
+
+1
+
+Area under ROC curve
+(AUC) is often use to assess
+classification performance.
+
+• It is computed by numerically
+integrating the ROC Curve
+
+• Provides values between 0
+(worse) and 1 (best)
+
+1.0
+True positives
+
+• The Area Under the ROC Curve
+
+• What does a AUC of 1
+indicate? Of 0?
+
+False positives
+15
+
+1.0
+
+Summarizing Classification Measures
+• Accuracy (# correct)/(# Examples): Fine with dataset is balanced across
+classes. Not fine otherwise. Can compute misclassification (error) rate
+
+• Confusion Matrix: Helps when data is imbalanced.
+• AUC: Useful for comparing algorithms
+
+16
+
+Evaluating Regression Problems
+
+17
+
+Recall: Types of Labels (or Targets)
+Labels are generally divided into two classes
+D = {(x1 , y1 ), (x2 , y2 ), . . . , (xi , yi ), . . . , (xN , yN )}
+<latexit sha1_base64="RH3kt5pd5TG+Lfdgol0Tls06hds=">AAACYXicbZFLSwMxFIXT8dXW11iX3QSL0EIpM0XQjVDUhatSwT6gU0omTdvQZGZIMuIwzF9071b/glvF9DFgWy8EDue7NzecuAGjUlnWe8bY2d3bP8jm8odHxyen5lmhI/1QYNLGPvNFz0WSMOqRtqKKkV4gCOIuI113dj/n3RciJPW9ZxUFZMDRxKNjipHS1tCcPsBb6MRlx+XxazK0q3MRaVGppl499eqVKnRGvpJVmDKaMrrNmtpZwmbFSYZmyapZi4Lbwl6JElhVa2h+6PtwyImnMENS9m0rUIMYCUUxI0neCSUJEJ6hCelr6SFO5CBeJJLAS+2M4NgX+ngKLty/EzHiUkbc1Z0cqancZHPzP9YP1fhmEFMvCBXx8HLROGRQ+XAeLxxRQbBikRYIC6rfCvEUCYSV/oS1LS5P8joUezOCbdGp12yrZj9dlRp3q3iyoAguQBnY4Bo0wCNogTbA4A18gW/wk/k0coZpFJatRmY1cw7Wyij+ApKpt3o=</latexit>
+
+• Regression: Decimal (Continuous) values are assigned as
+the label
+
+• Examples:
+
+size [sqft]
+
+age [yr]
+
+dist [mi]
+
+inc [$]
+
+dens [ppl/mi2 ]
+
+y
+
+• A person’s height or weight to the 3rd decimal place
+
+x1
+
+1250
+
+5
+
+2.85
+
+56,650
+
+12.5
+
+2.35
+
+x2
+
+3200
+
+9
+
+8.21
+
+245,800
+
+3.1
+
+3.95
+
+•
+
+x3
+
+825
+
+12
+
+0.34
+
+61,050
+
+112.5
+
+5.10
+
+The cost of a home
+
+Table 3.2: An example of a regression problem: prediction of the price of a
+house in a particular region. Here, features indicate the size of the house
+(size) in square feet, the age of the house (age) in years, the distance from
+the city center (dist) in miles, the average income in a one square mile radius (inc), and the population density in the same area (dens). The target
+indicates the price a house is sold at, e.g. in hundreds of thousands of dollars.
+
+• Stock market price
+• Outputting an image of a dog/cat/bear/fish
+• Create musical audio signals
+
+3.2 Useful notation
+• It is termed regression when a supervised learning algorithm
+
+learns a mapping from an input to a continuous label
+18
+
+Real number (e.g. decimal
+or float;
+In the machine learning literature we use k-tuples x = (x1 , x2 , . . . , xd ) to
+1.232,343,232.4545,…)
+denote data points. However, often times we can benefit from the algebraic
+
+notation, where each data point x is a column vector in the d-dimensional
+Euclidean space: x = [x1 x2 . . . xd ]> 2 Rd , where > is the transpose op-
+
+Evaluating Regression Models
+Ex: Median Housing Price prediction
+• Recall: Suppose you are a Data Scientist at a
+
+Housing Corporation. Your boss wants you to build
+a prediction model of median housing prices in
+California using their census data
+
+• Modifications:
+• Let’s use ‘Median Income’ as the only feature/
+attribute
+
+• Based on relationship between ‘Median Income’
+and ‘Median Housing Price’, let’s use linear
+regression to perform the prediction
+
+• Assume linear regression model has been trained
+19
+
+Median House Value Prediction
+
+Predicted value
+for given
+median income
+
+A simplified Linear Regression Model
+
+• For a given income, the
+
+model outputs the estimated
+house value
+
+• Consider three districts
+(represented as points)
+
+• Point#2 is predicted
+
+Predicting Value
+
+#3
+#2
+#1
+
+correctly, whereas Pts. #1
+and #3 are incorrect
+
+Median Income
+Indicates Predicted Value
+Indicates True Value
+20
+
+Median House Value Prediction
+
+Predicting
+value for given
+median income
+
+A simplified Linear Regression Model
+
+• Need to summarize
+
+performance over all points/
+predictions
+
+• Need a metric for regression
+similar to accuracy or AUC
+
+• Two common metrics are:
+
+Predicting Value
+
+#3
+#2
+#1
+
+• Mean Absolute Error (MAE)
+
+Median Income
+
+• Root Mean-Square Error
+
+Indicates Predicted Value
+Indicates True Value
+
+(RMSE)
+
+21
+
+Predicting
+value for
+given median
+
+Median House Value Prediction
+A simplified Linear Regression Model
+y3̂
+
+1
+M AE(y, ŷ) =
+N
+<latexit sha1_base64="T7xv6Od6QIaDoauR+pOaAUfoeYo=">AAACPnicbVDLSgMxFM34tr6qLt0Ei1BBy4wIuhF8UHBjqWCr0KlDJs3YYDIzJBlhiPkif8JfcKnuXLgTty5NHwutHggczjmXe3PClFGpXPfZGRufmJyanpktzM0vLC4Vl1eaMskEJg2csERchUgSRmPSUFQxcpUKgnjIyGV4e9LzL++IkDSJL1SekjZHNzGNKEbKSkGxenZULfsh17nZ8rtI6QE3m/AA+pFAWHtG1wz0ZcYDTQ88c12D93lA4Tbs53MT0PugWHIrbh/wL/GGpASGqAfFN7+T4IyTWGGGpGx5bqraGglFMSOm4GeSpAjfohvSsjRGnMi27n/XwA2rdGCUCPtiBfvqzwmNuJQ5D22SI9WVo15P/M9rZSrab2sap5kiMR4sijIGVQJ73cEOFQQrlluCsKD2Voi7yJakbMO/toTcFGwp3mgFf0lzp+K5Fe98t3R4PKxnBqyBdVAGHtgDh+AU1EEDYPAAnsALeHUenXfnw/kcRMec4cwq+AXn6xvnr69D</latexit>
+
+N
+X
+i=1
+
+|yi
+
+y3
+
+Predicting
+
+•
+
+Compute mean absolute error (MAE)
+by computing the error in the prediction
+for each sample, and averaging this error
+over all samples
+
+ŷi |
+
+22
+
+y2̂ = y2
+
+#2
+#
+
+y1
+y1̂
+
+Median
+Predicted
+
+True
+
+#
+
+Indicates Predicted
+Indicates True
+
+Predicting
+value for
+given median
+
+Median House Value Prediction
+A simplified Linear Regression Model
+y3̂
+y3
+
+Compute mean square error (MSE) by
+computing the error in the prediction for
+each sample, squaring each error, and
+averaging this result over all samples
+
+• May also take root of MSE (e.g. RMSE)
+N
+X
+1
+2
+M SE(y, ŷ) =
+(yi ŷi )
+N i=1
+
+Predicting
+
+•
+
+<latexit sha1_base64="FRMsuNvuGE3CvMLgoukBOzDcUW4=">AAACQHicbVDLSgMxFM34tr6qLt0Ei1BBy0wRdFMoiuhGUbQqdOqQSTNtaDIzJBlhCPkkf8JfcCXoxpU7cevK9LHwdSBwOOdc7s0JU0alct0nZ2x8YnJqema2MDe/sLhUXF65kkkmMGnghCXiJkSSMBqThqKKkZtUEMRDRq7D3kHfv74jQtIkvlR5SlocdWIaUYyUlYLi0cnFYdkPuc7Nlt9FSg+52YQ16EcCYe0ZfWqgLzMeaFrzzO0pLOcBhdtwkM9NQDdvq0Gx5FbcAeBf4o1ICYxwFhRf/XaCM05ihRmSsum5qWppJBTFjJiCn0mSItxDHdK0NEacyJYefNjADau0YZQI+2IFB+r3CY24lDkPbZIj1ZW/vb74n9fMVLTX0jROM0ViPFwUZQyqBPbbg20qCFYstwRhQe2tEHeRrUnZjn9sCbkp2FK83xX8JVfViudWvPOdUn1/VM8MWAProAw8sAvq4BicgQbA4B48gmfw4jw4b8678zGMjjmjmVXwA87nF1w8r1I=</latexit>
+
+Predicted
+
+True
+
+23
+
+#
+
+y2̂ = y2
+
+#2
+#
+
+y1
+y1̂
+
+Median
+Indicates Predicted
+Indicates True
+
+•
+
+Other metrics exist (R^2, F*, t-test,…), but we’ll cover these on an asneeded basis
+
+• Next Class
+Probability Review
+
+24
+
+
